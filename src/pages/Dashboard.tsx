@@ -1,24 +1,30 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Plane, LogOut, BellRing } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthUser } from "@/lib/auth-context";
 
-export const Route = createFileRoute("/_authenticated/app")({
-  head: () => ({
-    meta: [
-      { title: "Dashboard — Flight Price Notifier" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: AppPage,
-});
+export default function Dashboard() {
+  useEffect(() => {
+    document.title = "Dashboard — Flight Price Notifier";
 
-function AppPage() {
-  const { user } = Route.useRouteContext();
+    // This route is behind auth and shouldn't be indexed — no server-side
+    // per-route <head> anymore, so set it on mount instead.
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex";
+    document.head.appendChild(meta);
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, []);
+
+  const user = useAuthUser();
   const navigate = useNavigate();
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
+    navigate("/", { replace: true });
   }
 
   return (

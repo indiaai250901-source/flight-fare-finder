@@ -1,30 +1,13 @@
-import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Plane, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Sign in — Flight Price Notifier" },
-      {
-        name: "description",
-        content:
-          "Sign in or create an account to get flight price drop alerts from Taipei.",
-      },
-      { property: "og:title", content: "Sign in — Flight Price Notifier" },
-      {
-        property: "og:description",
-        content:
-          "Sign in or create an account to get flight price drop alerts from Taipei.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-  }),
-  component: AuthPage,
-});
+export default function AuthPage() {
+  useEffect(() => {
+    document.title = "Sign in — Flight Price Notifier";
+  }, []);
 
-function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -51,7 +34,7 @@ function AuthPage() {
         });
         if (error) throw error;
       }
-      navigate({ to: "/app" });
+      navigate("/app");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
