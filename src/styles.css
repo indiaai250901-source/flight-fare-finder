@@ -32,26 +32,44 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.11 0.015 285);
-  --foreground: oklch(0.96 0.01 285);
-  --card: oklch(0.15 0.02 285);
-  --card-foreground: oklch(0.96 0.01 285);
-  --popover: oklch(0.15 0.02 285);
-  --popover-foreground: oklch(0.96 0.01 285);
-  --primary: oklch(0.62 0.22 293);
-  --primary-foreground: oklch(0.98 0.01 293);
-  --secondary: oklch(0.2 0.025 285);
-  --secondary-foreground: oklch(0.96 0.01 285);
-  --muted: oklch(0.2 0.025 285);
-  --muted-foreground: oklch(0.68 0.03 285);
-  --accent: oklch(0.24 0.05 293);
-  --accent-foreground: oklch(0.96 0.01 293);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.98 0.01 25);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.62 0.22 293);
+  /* Glossy balloon-animal palette: light studio backdrop + a candy-bright,
+     iridescent brand gradient (orange -> pink -> teal -> green), inspired
+     by the reference image. Tokens only — every component already reads
+     these via bg-primary / bg-card / text-foreground etc., so this file is
+     the single place the whole app's look lives. */
+  --radius: 1.15rem;
+  --background: oklch(0.975 0.008 240);
+  --foreground: oklch(0.26 0.035 265);
+  --card: oklch(0.995 0.004 240);
+  --card-foreground: oklch(0.26 0.035 265);
+  --popover: oklch(0.995 0.004 240);
+  --popover-foreground: oklch(0.26 0.035 265);
+  --primary: oklch(0.71 0.19 38);
+  --primary-foreground: oklch(0.99 0.015 38);
+  --secondary: oklch(0.93 0.045 200);
+  --secondary-foreground: oklch(0.32 0.06 220);
+  --muted: oklch(0.955 0.012 235);
+  --muted-foreground: oklch(0.52 0.025 255);
+  --accent: oklch(0.9 0.075 195);
+  --accent-foreground: oklch(0.33 0.08 210);
+  --destructive: oklch(0.62 0.21 23);
+  --destructive-foreground: oklch(0.99 0.015 23);
+  --border: oklch(0.9 0.018 245);
+  --input: oklch(0.92 0.018 245);
+  --ring: oklch(0.71 0.19 38);
+
+  /* Balloon-dog gradient sweep: orange ears -> red/pink nose -> blue body ->
+     green/pink/orange legs. Used for accent text, blurred hero glows, and
+     glossy button/badge highlights. */
+  --gradient-balloon: linear-gradient(
+    120deg,
+    oklch(0.74 0.18 48) 0%,
+    oklch(0.74 0.21 25) 18%,
+    oklch(0.77 0.19 358) 36%,
+    oklch(0.72 0.15 235) 56%,
+    oklch(0.79 0.14 195) 75%,
+    oklch(0.81 0.17 148) 100%
+  );
 }
 
 @layer base {
@@ -65,6 +83,23 @@
 
   body {
     background-color: var(--color-background);
+    background-image:
+      radial-gradient(
+        ellipse 70% 45% at 15% -10%,
+        oklch(0.85 0.09 45 / 35%),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 100% 0%,
+        oklch(0.85 0.09 195 / 30%),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 50% 35% at 50% 100%,
+        oklch(0.88 0.08 155 / 22%),
+        transparent 60%
+      );
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -78,7 +113,42 @@
 }
 
 @utility glow-primary {
-  box-shadow: 0 0 60px -15px oklch(0.62 0.22 293 / 50%);
+  box-shadow: 0 10px 34px -10px oklch(0.71 0.19 38 / 55%);
+}
+
+@utility gradient-balloon-bg {
+  background-image: var(--gradient-balloon);
+}
+
+@utility gradient-balloon-text {
+  background-image: var(--gradient-balloon);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Glassy highlight sheen, like the specular streak on a balloon's surface.
+   Add alongside a rounded, positioned element (button, badge, card). */
+@utility glossy {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      oklch(1 0 0 / 70%) 0%,
+      oklch(1 0 0 / 0%) 45%
+    );
+    /* Blend rather than cover, so icons/text under the sheen stay legible —
+       this reads as a highlight across the surface, not an opaque layer. */
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
 }
 
 @keyframes fade-up {

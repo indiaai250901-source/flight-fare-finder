@@ -32,7 +32,7 @@ export default function Landing() {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary glow-primary">
+            <span className="glossy flex h-8 w-8 items-center justify-center rounded-lg bg-primary glow-primary">
               <Plane className="h-4 w-4 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight sm:text-base">
@@ -41,7 +41,7 @@ export default function Landing() {
           </Link>
           <Link
             to="/auth"
-            className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="glossy inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Sign in / 登入
           </Link>
@@ -52,7 +52,7 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[820px] -translate-x-1/2 rounded-full bg-primary/20 blur-[140px]"
+          className="gradient-balloon-bg pointer-events-none absolute left-1/2 top-0 h-[480px] w-[820px] -translate-x-1/2 rounded-full opacity-30 blur-[140px]"
         />
         <div className="relative mx-auto max-w-4xl px-4 pb-24 pt-24 text-center sm:px-6 sm:pt-32">
           <p
@@ -66,7 +66,7 @@ export default function Landing() {
             台北出發 · 東京 / 首爾航線監控中
           </p>
           <h1
-            className="animate-fade-up text-4xl font-bold leading-tight tracking-tight sm:text-6xl"
+            className="animate-fade-up gradient-balloon-text text-4xl font-bold leading-tight tracking-tight sm:text-6xl"
             style={{ "--fade-delay": "120ms" } as React.CSSProperties}
           >
             Flight Price Notifier
@@ -89,7 +89,7 @@ export default function Landing() {
           >
             <Link
               to="/auth"
-              className="inline-flex h-12 items-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 glow-primary"
+              className="glossy inline-flex h-12 items-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 glow-primary"
             >
               Sign in / 登入
             </Link>
@@ -104,12 +104,12 @@ export default function Landing() {
             {features.map((f, i) => (
               <article
                 key={f.title}
-                className="animate-fade-up rounded-2xl border border-border bg-card p-8 transition-colors hover:border-primary/40"
+                className="animate-fade-up rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
                 style={
                   { "--fade-delay": `${200 + i * 150}ms` } as React.CSSProperties
                 }
               >
-                <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent">
+                <span className="glossy mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent">
                   <f.icon className="h-5 w-5 text-primary" />
                 </span>
                 <h2 className="text-lg font-semibold">{f.title}</h2>

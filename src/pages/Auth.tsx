@@ -47,7 +47,7 @@ export default function AuthPage() {
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <span className="glossy flex h-8 w-8 items-center justify-center rounded-lg bg-primary glow-primary">
               <Plane className="h-4 w-4 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight sm:text-base">
@@ -58,7 +58,7 @@ export default function AuthPage() {
       </header>
 
       <main className="flex flex-1 items-center justify-center px-4 py-16">
-        <div className="animate-fade-up w-full max-w-sm rounded-2xl border border-border bg-card p-8">
+        <div className="animate-fade-up w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-lg">
           <h1 className="text-xl font-semibold">
             {mode === "signin" ? "Sign in / 登入" : "Sign up / 註冊"}
           </h1>
@@ -118,7 +118,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+              className="glossy inline-flex h-10 w-full items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {mode === "signin" ? "Sign in" : "Create account"}

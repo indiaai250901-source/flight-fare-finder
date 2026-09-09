@@ -32,7 +32,7 @@ export default function Dashboard() {
       <header className="border-b border-border/60">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary glow-primary">
+            <span className="glossy flex h-8 w-8 items-center justify-center rounded-lg bg-primary glow-primary">
               <Plane className="h-4 w-4 text-primary-foreground" />
             </span>
             <span className="text-sm font-semibold tracking-tight sm:text-base">
@@ -51,7 +51,7 @@ export default function Dashboard() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-16">
         <div className="animate-fade-up w-full max-w-lg text-center">
-          <span className="mx-auto mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent glow-primary">
+          <span className="glossy mx-auto mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent glow-primary">
             <BellRing className="h-7 w-7 text-primary" />
           </span>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
