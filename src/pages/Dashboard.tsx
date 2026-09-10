@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 
 const API_URL = import.meta.env.VITE_FLIGHT_API_URL as string;
 
-type PlanKey = "tokyo" | "seoul";
+type PlanKey = "tokyo" | "seoul" | "london";
 
 type PlanConfig = {
   label: string;
@@ -30,6 +30,7 @@ type PlanConfig = {
 const PLANS: Record<PlanKey, PlanConfig> = {
   tokyo: { label: "台北 ✈ 東京", origin: "TPE", destination: "TYO", route: "TPE-TYO", hint: 9325 },
   seoul: { label: "台北 ✈ 首爾", origin: "TPE", destination: "SEL", route: "TPE-SEL", hint: 5989 },
+  london: { label: "台北 ✈ 倫敦", origin: "TPE", destination: "LON", route: "TPE-LON", hint: 20216 },
 };
 
 type Subscription = { route: string; plan_name: string; target_price: number };
@@ -57,6 +58,7 @@ export default function Dashboard() {
   const [targets, setTargets] = useState<Record<PlanKey, string>>({
     tokyo: String(PLANS.tokyo.hint),
     seoul: String(PLANS.seoul.hint),
+    london: String(PLANS.london.hint),
   });
   const [submitting, setSubmitting] = useState<PlanKey | null>(null);
   const [error, setError] = useState<string | null>(null);
