@@ -19,10 +19,15 @@ const API_URL = import.meta.env.VITE_FLIGHT_API_URL as string;
 
 type PlanKey = "tokyo" | "seoul";
 
-const PLANS: Record
-  PlanKey,
-  { label: string; origin: string; destination: string; route: string; hint: number }
-> = {
+type PlanConfig = {
+  label: string;
+  origin: string;
+  destination: string;
+  route: string;
+  hint: number;
+};
+
+const PLANS: Record<PlanKey, PlanConfig> = {
   tokyo: { label: "台北 ✈ 東京", origin: "TPE", destination: "TYO", route: "TPE-TYO", hint: 9325 },
   seoul: { label: "台北 ✈ 首爾", origin: "TPE", destination: "SEL", route: "TPE-SEL", hint: 5989 },
 };
