@@ -108,6 +108,7 @@ export default function Dashboard() {
     london: String(PLANS.london.hint),
   });
   const [submitting, setSubmitting] = useState<PlanKey | null>(null);
+  const [cancelling, setCancelling] = useState<PlanKey | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -209,6 +210,42 @@ export default function Dashboard() {
     }
   }
 
+  async function handleCancel(planKey: PlanKey) {
+    const plan = PLANS[planKey];
+    if (!API_URL || !user.email) return;
+    if (!window.confirm(`確定要取消「${plan.label}」的訂閱嗎？本期效期內仍會收到通知，之後才會真正停止。`)) {
+      return;
+    }
+    setError(null);
+    setCancelling(planKey);
+    try {
+      const res = await fetch(`${API_URL}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, route: plan.route }),
+      });
+      if (!res.ok) throw new Error("cancel failed");
+      const data = await res.json();
+      setSubscriptions((s) => ({
+        ...s,
+        [plan.route]: {
+          ...(s[plan.route] ?? {
+            route: plan.route,
+            plan_name: planKey,
+            target_price: Number(targets[planKey]),
+          }),
+          subscription_status: "cancelled",
+          current_period_end_date:
+            data.current_period_end_date ?? String(data.current_period_end ?? "").slice(0, 10),
+        },
+      }));
+    } catch {
+      setError("取消訂閱失敗，請稍後再試");
+    } finally {
+      setCancelling(null);
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border/60">
@@ -297,11 +334,11 @@ export default function Dashboard() {
                     </p>
                   )}
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col gap-2">
                   <Button
                     className="w-full"
                     onClick={() => handleSubscribe(planKey)}
-                    disabled={submitting === planKey || loadingSubs}
+                    disabled={submitting === planKey || cancelling === planKey || loadingSubs}
                   >
                     {submitting === planKey ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -309,6 +346,16 @@ export default function Dashboard() {
                       buttonLabel(status)
                     )}
                   </Button>
+                  {status === "active" && (
+                    <button
+                      type="button"
+                      onClick={() => handleCancel(planKey)}
+                      disabled={cancelling === planKey || submitting === planKey}
+                      className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:text-destructive hover:underline disabled:opacity-50"
+                    >
+                      {cancelling === planKey ? "取消中…" : "取消訂閱"}
+                    </button>
+                  )}
                 </CardFooter>
               </Card>
             );
