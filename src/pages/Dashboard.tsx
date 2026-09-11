@@ -33,7 +33,54 @@ const PLANS: Record<PlanKey, PlanConfig> = {
   london: { label: "台北 ✈ 倫敦", origin: "TPE", destination: "LON", route: "TPE-LON", hint: 20216 },
 };
 
-type Subscription = { route: string; plan_name: string; target_price: number };
+type Subscription = {
+  route: string;
+  plan_name: string;
+  target_price: number;
+  subscription_status?: string;
+  current_period_end_date?: string;
+};
+
+// M2: a row's visible state for the card. Legacy M1 rows (no
+// subscription_status at all) and rows explicitly "pending_payment" are
+// treated the same — both need the user to pay before they're actually
+// served notifications (see m2-ecpay-subscription Step 7 migration note).
+type CardStatus = "none" | "pending_payment" | "active" | "cancelled" | "expired";
+
+function cardStatusOf(sub: Subscription | undefined): CardStatus {
+  if (!sub) return "none";
+  const s = sub.subscription_status;
+  if (s === "active" || s === "cancelled" || s === "expired") return s;
+  return "pending_payment";
+}
+
+function statusBadge(status: CardStatus) {
+  switch (status) {
+    case "active":
+      return <Badge>已訂閱（有效）</Badge>;
+    case "pending_payment":
+      return <Badge variant="secondary">未完成付款</Badge>;
+    case "cancelled":
+      return <Badge variant="outline">已取消</Badge>;
+    case "expired":
+      return <Badge variant="destructive">已結束</Badge>;
+    default:
+      return null;
+  }
+}
+
+function buttonLabel(status: CardStatus): string {
+  switch (status) {
+    case "none":
+      return "開始追蹤";
+    case "pending_payment":
+      return "完成付款";
+    case "expired":
+      return "重新訂閱";
+    default:
+      return "更新目標價";
+  }
+}
 
 export default function Dashboard() {
   useEffect(() => {
@@ -131,9 +178,29 @@ export default function Dashboard() {
         }),
       });
       if (!res.ok) throw new Error("subscribe failed");
+
+      // M2: /subscribe returns either an ECPay auto-submit checkout form
+      // (text/html — payment needed) or a plain status update
+      // (application/json — already active/cancelled-in-grace, no
+      // re-payment). res.json() on the HTML branch would silently throw,
+      // which is exactly the M1 bug that made the button do nothing.
+      const contentType = res.headers.get("content-type") ?? "";
+      if (contentType.includes("text/html")) {
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
+        return; // the page is navigating to ECPay's cashier now
+      }
+
+      const data = await res.json();
       setSubscriptions((s) => ({
         ...s,
-        [plan.route]: { route: plan.route, plan_name: planKey, target_price: targetPrice },
+        [plan.route]: {
+          ...(s[plan.route] ?? { route: plan.route, plan_name: planKey, target_price: targetPrice }),
+          target_price: targetPrice,
+          subscription_status: data.subscription_status ?? s[plan.route]?.subscription_status,
+        },
       }));
     } catch {
       setError("訂閱失敗，請稍後再試");
@@ -184,13 +251,13 @@ export default function Dashboard() {
           {(Object.keys(PLANS) as PlanKey[]).map((planKey) => {
             const plan = PLANS[planKey];
             const sub = subscriptions[plan.route];
-            const isSubscribed = Boolean(sub);
+            const status = cardStatusOf(sub);
             return (
               <Card key={planKey} className="flex flex-col">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{plan.label}</CardTitle>
-                    {isSubscribed && <Badge>已訂閱</Badge>}
+                    {statusBadge(status)}
                   </div>
                   <CardDescription>目前最低約 NT${plan.hint.toLocaleString()}</CardDescription>
                 </CardHeader>
@@ -207,9 +274,26 @@ export default function Dashboard() {
                     }
                     disabled={loadingSubs}
                   />
-                  {isSubscribed && (
+                  {sub && (
                     <p className="text-xs text-muted-foreground">
                       目前追蹤目標：NT${Number(sub.target_price).toLocaleString()}
+                    </p>
+                  )}
+                  {status === "pending_payment" && (
+                    <p className="text-xs text-muted-foreground">
+                      尚未完成付款，通知會在付款成功後開始發送。
+                    </p>
+                  )}
+                  {status === "cancelled" && (
+                    <p className="text-xs text-muted-foreground">
+                      已取消續訂
+                      {sub?.current_period_end_date ? `，有效至 ${sub.current_period_end_date}` : ""}
+                      （期間內仍會通知）。
+                    </p>
+                  )}
+                  {status === "expired" && (
+                    <p className="text-xs text-muted-foreground">
+                      訂閱已結束，重新訂閱即可恢復通知。
                     </p>
                   )}
                 </CardContent>
@@ -221,10 +305,8 @@ export default function Dashboard() {
                   >
                     {submitting === planKey ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : isSubscribed ? (
-                      "更新目標價"
                     ) : (
-                      "開始追蹤"
+                      buttonLabel(status)
                     )}
                   </Button>
                 </CardFooter>
